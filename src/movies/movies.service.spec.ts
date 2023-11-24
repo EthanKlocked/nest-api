@@ -25,7 +25,7 @@ describe('MoviesService', () => {
     });
 
     describe("getOne", () => {
-        it("should regurn a movie", () => {
+        it("should return a movie", () => {
             service.create({
                 title: 'Test Movie',
                 genres: ['test'],
@@ -36,7 +36,7 @@ describe('MoviesService', () => {
             expect(movie.id).toEqual(1);
         });
 
-        it("should trhow 404 error", () => {
+        it("should throw 404 error", () => {
             try{
                 service.getOne(999);
             } catch(e){

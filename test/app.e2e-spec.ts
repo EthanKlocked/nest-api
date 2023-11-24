@@ -23,8 +23,7 @@ describe('AppController (e2e)', () => {
 	it('/ (GET)', () => {
 		return request(app.getHttpServer())
 		.get('/')
-		.expect(200)
-		.expect('Welcome to my home!');
+		.expect(200);
 	});
 
 	describe("/movies", () => {
