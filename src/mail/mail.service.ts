@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotImplementedException } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from "@nestjs/config";
+import { MailRequestDto } from './dto/mail.request.dto';
 
 @Injectable()
 export class MailService {
-    private transporter;
+    private readonly transporter;
 
     constructor(private readonly configService: ConfigService){
+        console.log('constucted');
         this.transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             port: 587,
@@ -18,17 +20,16 @@ export class MailService {
         });
     }
 
-    async sendMail(to: string, subject: string, content: string) {
+    async sendMail(body: MailRequestDto) {
         try{
             await this.transporter.sendMail({
-                from : 'test@test.com',
-                to : to,
-                subject : subject,
-                text : content
+                from : 'nestTester@test.com',
+                to : body.to,
+                subject : body.subject,
+                text : body.content
             });
-            console.log('succeed to send mail');
         }catch(e){
-            console.log('error occured in sending mail service',e);
+            throw new NotImplementedException(e.message); 
         }
     }
 }
