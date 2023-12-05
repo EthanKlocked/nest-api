@@ -4,6 +4,9 @@ import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CatModule } from './cat/cat.module';
+import { UserModule } from './user/user.module';
+import { MailModule } from './mail/mail.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
 	imports: [
@@ -12,6 +15,10 @@ import { CatModule } from './cat/cat.module';
 			cache:true,
 			isGlobal:true,
 			envFilePath: `.env.${process.env.NODE_ENV}`,
+		}),
+		/********* CACHE SETTING *********/
+		CacheModule.register({
+			isGlobal: true
 		}),
 		/********* DATABASE SETTING *********/
 		MongooseModule.forRootAsync({
@@ -31,6 +38,8 @@ import { CatModule } from './cat/cat.module';
 		/********* CUSTOM MODULES *********/
 		MoviesModule,
 		CatModule,
+		UserModule,
+		MailModule,
 	],
 	controllers: [AppController],
 	providers: [],

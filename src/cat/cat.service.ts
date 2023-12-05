@@ -13,16 +13,16 @@ export class CatService {
         const isCatExist = await this.catModel.exists({ email });
     
         if (isCatExist) {
-          throw new UnauthorizedException('Already exists the cat!');
+            throw new UnauthorizedException('Already exists the cat!');
         }
     
         //const hashedPassword = await bcrypt.hash(password, 10);
         const hashedPassword = password;
     
         const cat = await this.catModel.create({
-          email,
-          name,
-          password: hashedPassword,
+            email,
+            name,
+            password: hashedPassword,
         });
     
         return cat.readOnlyData;
