@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
-import { MoviesModule } from './movies/movies.module';
 import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CatModule } from './cat/cat.module';
 import { UserModule } from './user/user.module';
 import { MailModule } from './mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager';
@@ -36,8 +34,6 @@ import { CacheModule } from '@nestjs/cache-manager';
 			inject: [ConfigService],
 		}),
 		/********* CUSTOM MODULES *********/
-		MoviesModule,
-		CatModule,
 		UserModule,
 		MailModule,
 	],
