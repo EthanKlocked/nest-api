@@ -30,14 +30,13 @@ export class UserService {
         }catch(e){
             throw new NotImplementedException(e.message); 
         }
-
     }
 
     async verify(body: UserVerifyDto){
         try{
             const targetCode = await this.cacheManager.get(body.mail);
-            if(body.verificationCode == targetCode) return true;
-            else throw new UnauthorizedException('invalidate code');
+            if(body.verificationCode == targetCode) return 'Success';
+            else throw new UnauthorizedException('Invalidate');
         }catch(e){
             throw new NotImplementedException(e.message);
         }
@@ -45,16 +44,16 @@ export class UserService {
 
     async signUp(body: UserRequestDto) {
         try{
-            const { email, name, password } = body;
-            const isUserExist = await this.userModel.exists({ email });
+            const { mail, name, password } = body;
+            const isUserExist = await this.userModel.exists({ mail });
             if (isUserExist) {
-                throw new UnauthorizedException('Already exists the user!');
+                throw new UnauthorizedException('The user already exists');
             }
             //const hashedPassword = await bcrypt.hash(password, 10);
             const hashedPassword = password;
         
             const user = await this.userModel.create({
-                email,
+                mail,
                 name,
                 password: hashedPassword,
             });

@@ -8,7 +8,6 @@ export class MailService {
     private readonly transporter;
 
     constructor(private readonly configService: ConfigService){
-        console.log('constucted');
         this.transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             port: 587,
@@ -28,6 +27,7 @@ export class MailService {
                 subject : body.subject,
                 text : body.content
             });
+            return 'Success';
         }catch(e){
             throw new NotImplementedException(e.message); 
         }
