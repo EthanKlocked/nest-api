@@ -15,7 +15,7 @@ export class User extends Document {
     })
     @IsEmail()
     @IsNotEmpty()
-    email: string;
+    mail: string;
 
     @Prop({
         required: true,
@@ -37,7 +37,7 @@ export class User extends Document {
 
     readonly readOnlyData: {
         id: string;
-        email: string;
+        mail: string;
         name: string;
     };
 }

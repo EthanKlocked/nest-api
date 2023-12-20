@@ -23,7 +23,7 @@ export class MailService {
         try{
             await this.transporter.sendMail({
                 from : 'nestTester@test.com',
-                to : body.to,
+                to : body.mail,
                 subject : body.subject,
                 text : body.content
             });

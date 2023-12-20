@@ -6,7 +6,7 @@ export class MailRequestDto {
     @IsNotEmpty()
     @IsEmail()  
     @ApiProperty({ description: 'to', example: 'test@test.com' })  
-    to: string;
+    mail: string;
 
     @IsOptional()
     @IsString()

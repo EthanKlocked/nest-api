@@ -9,6 +9,7 @@ import { generateRandomNumber } from 'src/library';
 import { MailService } from 'src/mail/mail.service';
 import { MailRequestDto } from 'src/mail/dto/mail.request.dto';
 import { UserVerifyDto } from './dto/user.verify.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -24,7 +25,7 @@ export class UserService {
             const verifyToken : string = generateRandomNumber(6);
             body.subject = 'verifcation number';
             body.content = verifyToken;
-            await this.cacheManager.set(body.to, verifyToken, 180000);
+            await this.cacheManager.set(body.mail, verifyToken, 180000);
             this.mailService.sendMail(body);
             return limitSeconds;
         }catch(e){
@@ -49,9 +50,7 @@ export class UserService {
             if (isUserExist) {
                 throw new UnauthorizedException('The user already exists');
             }
-            //const hashedPassword = await bcrypt.hash(password, 10);
-            const hashedPassword = password;
-        
+            const hashedPassword = await bcrypt.hash(password, 10);
             const user = await this.userModel.create({
                 mail,
                 name,

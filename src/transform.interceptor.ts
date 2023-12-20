@@ -20,8 +20,8 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>>{
             .handle()
             .pipe(map((data) => {
                 return { 
-                    result : response.statusCode,
-                    data : data
+                    data : data,
+                    statusCode : response.statusCode
                 };
             }));
     }
