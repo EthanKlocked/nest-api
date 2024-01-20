@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotImplementedException, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, NotImplementedException, UnauthorizedException, RequestTimeoutException, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schema/user.schema';
 import { Model } from 'mongoose';
@@ -19,6 +19,37 @@ export class UserService {
         private readonly mailService: MailService
     ) {}
 
+    async findAll(){
+        try{
+            const users = await this.userModel.find().exec();
+            return users.map((u:User) : User['readOnlyData'] => {
+                const { _id, mail, name } = u;
+                return {
+                    id: _id.toHexString(),
+                    mail,
+                    name
+                };
+            });    
+        }catch(e){
+            throw new NotImplementedException(e.message);            
+        }
+    }
+
+    async signUp(body: UserRequestDto) {
+        const { mail, name, password } = body;
+        const isUserExist = await this.userModel.exists({ mail });
+        if (isUserExist) {
+            throw new ConflictException('The user already exists');
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await this.userModel.create({
+            mail,
+            name,
+            password: hashedPassword,
+        });
+        return user.readOnlyData;
+    }
+
     async sendVerification(body: MailRequestDto) {
         try{
             const limitSeconds : number = 180000;
@@ -33,32 +64,10 @@ export class UserService {
         }
     }
 
-    async verify(body: UserVerifyDto){
-        try{
-            const targetCode = await this.cacheManager.get(body.mail);
-            if(body.verificationCode == targetCode) return 'Success';
-            else throw new UnauthorizedException('Invalidate');
-        }catch(e){
-            throw new NotImplementedException(e.message);
-        }
-    }
-
-    async signUp(body: UserRequestDto) {
-        try{
-            const { mail, name, password } = body;
-            const isUserExist = await this.userModel.exists({ mail });
-            if (isUserExist) {
-                throw new UnauthorizedException('The user already exists');
-            }
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const user = await this.userModel.create({
-                mail,
-                name,
-                password: hashedPassword,
-            });
-            return user.readOnlyData;
-        }catch(e){
-            throw new NotImplementedException(e.message);            
-        }
+    async verify(body: UserVerifyDto){        
+        const targetCode = await this.cacheManager.get(body.mail);
+        if(targetCode === undefined) throw new RequestTimeoutException('not exist or timed out');
+        if(body.verificationCode == targetCode) return 'Success';
+        else throw new UnauthorizedException('Invalidate');
     }
 }
