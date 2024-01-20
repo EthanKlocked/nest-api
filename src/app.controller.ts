@@ -13,5 +13,5 @@ export class AppController {
     home(){
         const name = this.configService.get<string>("APP_NAME");
         return `Welcome to my ${name}!`
-    }
+    }   
 }

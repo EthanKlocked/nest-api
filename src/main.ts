@@ -13,14 +13,13 @@ async function bootstrap() {
 		transform: true
 	}));
 
+	app.useGlobalInterceptors(new TransformInterceptor);
+
 	const config = new DocumentBuilder()
 		.setTitle('Nest API')
 		.setDescription('Nestjs API document made by Ethan Kim')
 		.setVersion('1.0')
-		.build();
-
-	app.useGlobalInterceptors(new TransformInterceptor);
-
+		.build();	
 	const document = SwaggerModule.createDocument(app, config);
 	SwaggerModule.setup('api', app, document);
 	
