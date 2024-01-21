@@ -22,25 +22,42 @@ export class UserService {
     async findAll(){
         try{
             const users = await this.userModel.find().exec();
-            return users.map((u:User) : User['readOnlyData'] => {
-                const { _id, mail, name } = u;
-                return {
-                    id: _id.toHexString(),
-                    mail,
-                    name
-                };
-            });    
+            return users.map((u:User) : User['readOnlyData'] => u.readOnlyData);    
         }catch(e){
             throw new NotImplementedException(e.message);            
         }
     }
 
+    async findOne(option: object = null){
+        try{
+            const user = await this.userModel.findOne(option);
+            return user;
+        }catch(e){
+            throw new NotImplementedException(e.message);            
+        }
+    }    
+
+    async findById(id:string){
+        try{
+            const user = await this.userModel.findById(id);
+            return user;
+        }catch(e){
+            throw new NotImplementedException(e.message);            
+        }        
+    }
+
     async signUp(body: UserRequestDto) {
         const { mail, name, password } = body;
+
+        //check time expired 
+        const timePass = await this.cacheManager.get(body.mail);
+        if(!timePass || timePass != 'passed') throw new RequestTimeoutException('not verified or timed out');
+
+        //check user duplicated
         const isUserExist = await this.userModel.exists({ mail });
-        if (isUserExist) {
-            throw new ConflictException('The user already exists');
-        }
+        if (isUserExist) throw new ConflictException('The user already exists');
+
+        //join start
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await this.userModel.create({
             mail,
@@ -66,8 +83,11 @@ export class UserService {
 
     async verify(body: UserVerifyDto){        
         const targetCode = await this.cacheManager.get(body.mail);
-        if(targetCode === undefined) throw new RequestTimeoutException('not exist or timed out');
-        if(body.verificationCode == targetCode) return 'Success';
+        if(targetCode === undefined) throw new RequestTimeoutException('not sent or timed out');
+        if(body.verificationCode === targetCode){
+            await this.cacheManager.set(body.mail, 'passed', 300000); //limited time session for 5mins in joining process 
+            return 'Success';
+        } 
         else throw new UnauthorizedException('Invalidate');
     }
 }

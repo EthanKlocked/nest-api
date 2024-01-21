@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { MailModule } from './mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
 	imports: [
@@ -21,6 +22,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 		/********* DATABASE SETTING *********/
 		MongooseModule.forRootAsync({
 			imports: [ConfigModule],
+			inject: [ConfigService],
 			useFactory: async (configService: ConfigService) => {
 				const db_path = configService.get<string>('DB_PATH');
 				const db_name = configService.get<string>('DB_NAME');
@@ -31,11 +33,11 @@ import { CacheModule } from '@nestjs/cache-manager';
 					dbName: db_name
 			  	});
 			},
-			inject: [ConfigService],
 		}),
 		/********* CUSTOM MODULES *********/
 		UserModule,
 		MailModule,
+		AuthModule,
 	],
 	controllers: [AppController],
 	providers: [],

@@ -43,3 +43,11 @@ export class User extends Document {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.virtual('readOnlyData').get(function (this: User) {
+    return {
+        id: this.id,
+        email: this.mail,
+        name: this.name,
+    };
+});
