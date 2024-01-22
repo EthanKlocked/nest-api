@@ -88,6 +88,6 @@ export class UserService {
             await this.cacheManager.set(body.mail, 'passed', 300000); //limited time session for 5mins in joining process 
             return 'Success';
         } 
-        else throw new UnauthorizedException('Invalidate');
+        else throw new UnauthorizedException('Invalid code');
     }
 }

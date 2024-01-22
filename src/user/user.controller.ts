@@ -7,6 +7,7 @@ import { ApiTags, ApiOperation, ApiBody, ApiResponse} from '@nestjs/swagger'
 import { LocalAuthGuard } from 'src/auth/guard/local.guard';
 import { UserLoginDto } from './dto/user.login.dto';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
+import { ApiGuard } from 'src/auth/guard/api.guard';
 
 
 @Controller('user')
@@ -14,9 +15,12 @@ import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
+    @UseGuards(ApiGuard)
     @Get()
     @ApiOperation({ summary: 'Find Every Users Info', description: 'get every users information for test environment' })
     @ApiResponse({ status: 200, description: 'Success' })    
+    @ApiResponse({ status: 400, description: 'Request without API KEY' })    
+    @ApiResponse({ status: 403, description: 'Invalid API KEY' })    
     async findAll() {
         return await this.userService.findAll();
     }
@@ -51,7 +55,7 @@ export class UserController {
     @ApiOperation({ summary: 'Verify digit code', description: 'Check if the verificationCode value is same with the code server sent and cached for limited time' })
     @ApiBody({ type: UserVerifyDto })
     @ApiResponse({ status: 201, description: 'Success' })
-    @ApiResponse({ status: 401, description: 'Invalidate code' })
+    @ApiResponse({ status: 401, description: 'Invalid code' })
     @ApiResponse({ status: 408, description: 'Not sent or time expired' })    
     async verify(@Body() body: UserVerifyDto) {
         return await this.userService.verify(body);
@@ -62,7 +66,7 @@ export class UserController {
     @ApiOperation({ summary: 'Login', description: 'Login with body information including e-mail and password and issue accessToken if request would be validate.' })
     @ApiBody({ type: UserLoginDto })
     @ApiResponse({ status: 201, description: 'Success' })
-    @ApiResponse({ status: 401, description: 'Invalidate e-mail or password' })    
+    @ApiResponse({ status: 401, description: 'Invalid e-mail or password' })    
 	async login(@Request() req, @Res({ passthrough: true}) response) {
 		const accessToken = req.user.accessToken;
 		await response.cookie('Authorization', accessToken);
